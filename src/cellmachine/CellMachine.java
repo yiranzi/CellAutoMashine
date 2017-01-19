@@ -1,40 +1,60 @@
 package cellmachine;
 
+import java.util.ArrayList;
+
 import javax.swing.JFrame;
 
+import com.sun.javafx.print.Units;
+
+import animal.Animals;
+import animal.Live;
+import animal.People;
 import cell.Cell;
+import cell.Unit;
 import field.Field;
 import field.View;
+import item.Item;
 
 public class CellMachine {
+	private static final String AnimalList = null;
+
 	public static void main(String[] args) {
 		int size = 30;
-		int iType = 2;
+		int iType = 1;
+		ArrayList<Unit> unitList = new ArrayList<Unit>();
+		ArrayList<Live> liveList = new ArrayList<Live>();
+		Cell[] cellList = new Cell[size * size];
+		//初始化存储位置的field
 		Field field = new Field(size,size);
-		for ( int row = 0; row<field.getHeight(); row++ ) {
-			for ( int col = 0; col<field.getWidth(); col++ ) {
-				field.place(row, col, new Cell());
-			}
-		}
-		for ( int row = 0; row<field.getHeight(); row++ ) {
-			for ( int col = 0; col<field.getWidth(); col++ ) {
-				Cell cell = field.get(row, col);
-				if ( Math.random() < 0.2 ) {
-					cell.reborn();
-					if(iType ==2)
-					{
-						cell.prepare(true);
-						cell.readyAlive();
-					}
-						
-					else
-						cell.reborn();
+		//初始化所有的生物
+		People person = new People(15,15);
+		unitList.add(person);
+		field.place(person);
+		Item stone = new Item(20,20);
+		unitList.add(stone);
+		field.place(stone);
 
-				}
-				//if(row == 30 &&col == 30)cell.reborn();
+		//拿到所有的生物
+		for(Unit units : unitList)
+		{
+			System.out.println(units instanceof Live);
+			if(units instanceof Live)
+			{
+				liveList.add((Live)units);
 			}
 		}
-		View view = new View(field);
+		
+		//给生物的状态做初始化
+		for(Live lives : liveList)
+		{
+			lives.reborn();
+		}
+	
+		//关联上图形界面
+		View view = new View(cellList,size,size);
+		//更新图像数据
+		unitList.toArray(cellList);
+		
 		JFrame frame = new JFrame();
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setResizable(false);
@@ -43,93 +63,22 @@ public class CellMachine {
 		frame.pack();
 		frame.setVisible(true);
 		
-
+		//进行周期处理
+		
+		int count = 0;
 		for ( int i=0; i<1000; i++ ) {
-
-			switch(iType)
+			//人的回合
+			for(Live lives : liveList)
 			{
-				case 1:		
-					for ( int row = 0; row<field.getHeight(); row++ ) {
-						for ( int col = 0; col<field.getWidth(); col++ ) {
-							Cell cell = field.get(row, col);
-							Cell[] neighbour = field.getNeighbour(row, col);
-							int numOfLive = 0;
-							
-							for ( Cell c : neighbour ) {
-
-								if ( c.isAlive() ) {
-									numOfLive++;
-								}
-							}
-							System.out.print("["+row+"]["+col+"]:");
-							System.out.print(cell.isAlive()?"live":"dead");
-							System.out.print(":"+numOfLive+"-->");
-							if ( cell.isAlive() ) 
-							{
-								if ( numOfLive <2 || numOfLive >3 ) 
-								{
-									cell.die();
-									System.out.print("die");
-								}
-							} else if ( numOfLive == 3) {
-								cell.reborn();
-								System.out.print("reborn");
-							}
-							System.out.println();
-						}
-					}
-					break;
-				case 2:
-					for ( int row = 0; row<field.getHeight(); row++ ) {
-						for ( int col = 0; col<field.getWidth(); col++ ) {
-							Cell cell = field.get(row, col);
-							Cell[] neighbour = field.getNeighbour(row, col);
-							int numOfLive = 0;
-							
-							for ( Cell c : neighbour ) {
-
-								if ( c.isAlive() ) {
-									numOfLive++;
-								}
-							}
-							System.out.print("["+row+"]["+col+"]:");
-							System.out.print(cell.isAlive()?"live":"dead");
-							System.out.print(":"+numOfLive+"-->");
-							if ( cell.isAlive() ) 
-							{
-								if ( numOfLive <2 || numOfLive >4 ) 
-								{
-									//cell.die();
-									cell.prepare(false);
-									System.out.print("die");
-								}
-							} else if ( numOfLive == 3) {
-								//cell.reborn();
-								cell.prepare(true);
-								System.out.print("reborn");
-							}
-							System.out.println();
-						}
-					}
-					break;
-				default:
-					break;
+				if(count<50)lives.move('r');
+				else if(count<100)lives.move('l');
+				else count =-1;
 			}
-			
-			if(iType == 2)
-			{
-				for ( int row = 0; row<field.getHeight(); row++ ) {
-					for ( int col = 0; col<field.getWidth(); col++ ) {
-					Cell cell = field.get(row, col);
-					cell.readyAlive();
-					}
-				}
-			}
-
+			count++;
 			System.out.println("UPDATE");
 			frame.repaint();
 			try {
-				Thread.sleep(50);
+				Thread.sleep(10);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
