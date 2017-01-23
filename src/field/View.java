@@ -16,6 +16,7 @@ public class View extends JPanel {
 	private int countX;
 	private int countY;
 	private Cell[] SomeCells;	
+	private boolean b = false;
 
 	public View(Cell[] cellList,int widthnumber,int heightNumber)
 	{
@@ -27,20 +28,25 @@ public class View extends JPanel {
 
 	@Override
 	public void paint(Graphics g) {
-//		super.paint(g);
-//		for ( int row = 0; row<theField.getHeight(); row++ ) {
-//			for ( int col = 0; col<theField.getWidth(); col++ ) {
-//				Cell cell = theField.get(row, col);
-//				if ( cell != null ) {
-//					cell.draw(g, col*GRID_SIZE, row*GRID_SIZE, GRID_SIZE);
-//				}
-//			}
-//		}
+		super.paint(g);
+		if(!b)
+		{
+			for ( int row = 0; row<countX; row++ ) {
+				for ( int col = 0; col<countY; col++ ) 
+				{
+					//cell.draw(g, col*GRID_SIZE, row*GRID_SIZE, GRID_SIZE);
+					g.drawRect(col*GRID_SIZE, row*GRID_SIZE, GRID_SIZE, GRID_SIZE);
+				}
+			}
+			b =true;
+		}
 		for(Cell cell:SomeCells)
 		{
-			if(cell!=null)
+			if(cell!=null && cell.GetVisible())
 			cell.draw(g, cell.GetX()*GRID_SIZE, cell.GetY()*GRID_SIZE, GRID_SIZE);
 		}
+
+
 	}
 	@Override
 	public Dimension getPreferredSize() {

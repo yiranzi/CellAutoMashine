@@ -7,5 +7,6 @@ public interface Cell {
 	public int GetX();
 	public int GetY();
 	public void draw(Graphics g, int x, int y, int size);	
+	public boolean GetVisible();//绘制的时候需要判断
 
 }
